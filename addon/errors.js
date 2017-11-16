@@ -8,8 +8,14 @@ const {
 } = Ember;
 
 export default EmberObject.extend({
-  unknownProperty(property) {
-    set(this, property, emberArray());
-    return get(this, property);
-  }
+  init() {
+    this._super(...arguments);
+    let { _validators } = this;
+
+    _validators.forEach((validator) => {
+      if (!get(this, validator.property)) {
+        set(this, validator.property, emberArray());
+      }
+    })
+  },
 });

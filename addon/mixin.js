@@ -107,7 +107,7 @@ export default Mixin.create(setValidityMixin, {
 
   init() {
     this._super(...arguments);
-    this.errors = Errors.create();
+
     this.dependentValidationKeys = {};
     this.validators = emberArray();
 
@@ -116,6 +116,8 @@ export default Mixin.create(setValidityMixin, {
     }
 
     this.buildValidators();
+
+    this.errors = Errors.create({ _validators: this.validators });
 
     this.validators.forEach((validator) => {
       validator.addObserver('errors.[]', this, function(sender) {
@@ -200,6 +202,18 @@ export default Mixin.create(setValidityMixin, {
       }
 
       return errors;
+    });
+  },
+
+  forceErrorsVisibility(allErrors) {
+    let errors = allErrors || this.get('errors');
+
+    keys(this).forEach(function(key) {
+      let error = errors.get(key);
+
+      if (key !== '_validators' && error.set) {
+        error.set('forceShow', true);
+      }
     });
   },
 
